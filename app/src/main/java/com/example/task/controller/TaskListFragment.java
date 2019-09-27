@@ -9,10 +9,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.example.task.R;
 import com.example.task.model.Task;
 import com.example.task.repository.TaskRepository;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -23,10 +26,17 @@ public class TaskListFragment extends Fragment {
 
     public static final String ARG_CURRENT_PAGE_TASK_LIST = "argCurrentPageTaskList";
     public static final String TAG_EDIT_TASK_FRAGMENT = "tagEditTaskFragment";
+    public static final int REQUEST_CODE_TASK_LIST_ADD = 1;
+    public static final int REQUEST_CODE = 1;
+    public static final String FRAGMENT_ADD_TASK = "fragmentAddTask";
+    public static final int REQUEST_CODE_TASK_LIST_EDIT = 2;
     private RecyclerView mRecyclerView;
     private TaskListFragment.TaskAdapter mTaskAdapter;
     private List<Task> mTask;
     private int currentPage;
+    private FloatingActionButton mAddFlotingButton;
+    private ImageView mTaskImage;
+
 
     public static TaskListFragment newInstance(int currentPage) {
 
@@ -57,14 +67,23 @@ public class TaskListFragment extends Fragment {
 
         initUI(view);
 
-        if (mTask == null){
-            mRecyclerView.setBackgroundResource(R.drawable.bac);
-        }
-
         mTask = TaskRepository.getInstance().getTaskList(currentPage);
 
         mTaskAdapter = new TaskAdapter(mTask);
+
+        if (mTaskAdapter.getItemCount() > 0)
+            mTaskImage.setVisibility(View.GONE);
+
         mRecyclerView.setAdapter(mTaskAdapter);
+
+        mAddFlotingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AddTaskFragment addTaskFragment = AddTaskFragment.newInstance(currentPage);
+                addTaskFragment.setTargetFragment(TaskListFragment.this, REQUEST_CODE_TASK_LIST_ADD);
+                addTaskFragment.show(getFragmentManager(), FRAGMENT_ADD_TASK);
+            }
+        });
 
         return view;
     }
@@ -72,6 +91,8 @@ public class TaskListFragment extends Fragment {
     private void initUI(View view) {
         mRecyclerView = view.findViewById(R.id.task_recycler_view_fragment);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mAddFlotingButton = view.findViewById(R.id.add_floating_button);
+        mTaskImage = view.findViewById(R.id.task_image);
     }
 
     private class TaskHolder extends RecyclerView.ViewHolder{
@@ -91,6 +112,7 @@ public class TaskListFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     EditTaskFragment editTaskFragment = EditTaskFragment.newInstance(currentPage , mTask.getmID());
+                    editTaskFragment.setTargetFragment(TaskListFragment.this, REQUEST_CODE_TASK_LIST_EDIT);
                     editTaskFragment.show(getFragmentManager(), TAG_EDIT_TASK_FRAGMENT);
                 }
             });
@@ -104,7 +126,13 @@ public class TaskListFragment extends Fragment {
 
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
             String dateString = simpleDateFormat.format(mTask.getmDate());
-            mDateTimeTextView.setText(dateString);
+//            mDateTimeTextView.setText(dateString);
+
+            SimpleDateFormat simpleTimeFormat = new SimpleDateFormat("hh:mm");
+            String timeString = simpleTimeFormat.format(mTask.getmTime());
+//            mDateTimeTextView.setText(dateString);
+
+            mDateTimeTextView.setText(dateString + " " + timeString);
 
             if (!mTask.getmTitle().equals("")) {
                 mPictureTextView.setText(String.valueOf(mTask.getmTitle().charAt(0)));
@@ -136,6 +164,16 @@ public class TaskListFragment extends Fragment {
         @Override
         public int getItemCount() {
             return mTask.size();
+        }
+    }
+
+    public void notifyAdapter(){
+        mTaskAdapter.notifyDataSetChanged();
+        if (mTaskAdapter.getItemCount() > 0){
+            mTaskImage.setVisibility(View.GONE);
+        }
+        if (mTaskAdapter.getItemCount() == 0){
+            mTaskImage.setVisibility(View.VISIBLE);
         }
     }
 
