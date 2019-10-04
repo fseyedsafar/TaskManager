@@ -22,21 +22,11 @@
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
+            android:background="#004D40"
             app:tabIndicatorColor="#000000"
-            app:tabTextAppearance="@style/TextAppearance.AppCompat.Medium" />
+            app:tabTextAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:tabTextColor="#FFFFFF" />
 
     </androidx.viewpager.widget.ViewPager>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/add_floating_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_weight="1"
-        android:foregroundGravity="bottom"
-        android:hapticFeedbackEnabled="false"
-        android:text="ok"
-        app:backgroundTint="@color/colorPLight" />
 
 </LinearLayout>

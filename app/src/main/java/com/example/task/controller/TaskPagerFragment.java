@@ -7,17 +7,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
+
 import com.example.task.R;
 import com.example.task.model.PersonAndTask;
 import com.example.task.repository.PersonAndTaskRepository;
 import com.example.task.repository.TaskRepository;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -29,11 +31,11 @@ public class TaskPagerFragment extends Fragment {
 
     public static final String TAG_ADD_TASK_FRAGMENT = "tagAddTaskFragment";
     public static final String ARG_TASK_PAGER_FRAGMENT_ID = "argTaskPagerFragmentId";
+    public static final int REQUEST_CODE_TARGET_TASK_PAGER = 4;
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
-    private FloatingActionButton mAddFlotingButton;
     private RecyclerView mTaskRecyclerView;
-    private UUID mIDArguman;
+    static UUID mUserID;
     private List<PersonAndTask> mLoginAndTask;
     private List mLoginAndTaskRemove = new ArrayList();
 
@@ -41,11 +43,11 @@ public class TaskPagerFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static TaskPagerFragment newInstance(UUID id) {
+    public static TaskPagerFragment newInstance(UUID userID) {
 
         Bundle args = new Bundle();
 
-        args.putSerializable(ARG_TASK_PAGER_FRAGMENT_ID, id);
+        args.putSerializable(ARG_TASK_PAGER_FRAGMENT_ID, userID);
 
         TaskPagerFragment fragment = new TaskPagerFragment();
         fragment.setArguments(args);
@@ -56,14 +58,14 @@ public class TaskPagerFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mIDArguman = (UUID) getArguments().getSerializable(ARG_TASK_PAGER_FRAGMENT_ID);
+        mUserID = (UUID) getArguments().getSerializable(ARG_TASK_PAGER_FRAGMENT_ID);
         mLoginAndTask = PersonAndTaskRepository.getInstance().getmPersonAndTask();
 
         for (int i = 0; i < mLoginAndTask.size() ; i++) {
-            if (mLoginAndTask.get(i).getmID().equals(mIDArguman)) {
-                TaskRepository.getInstance().setmTaskToDo(mLoginAndTask.get(i).getmTaskToDo());
-                TaskRepository.getInstance().setmTaskDoing(mLoginAndTask.get(i).getmTaskDoing());
-                TaskRepository.getInstance().setmTaskDone(mLoginAndTask.get(i).getmTaskDone());
+            if (mLoginAndTask.get(i).getmID().equals(mUserID)) {
+                TaskRepository.getInstance(getActivity()).setmTaskToDo(mLoginAndTask.get(i).getmTaskToDo());
+                TaskRepository.getInstance(getActivity()).setmTaskDoing(mLoginAndTask.get(i).getmTaskDoing());
+                TaskRepository.getInstance(getActivity()).setmTaskDone(mLoginAndTask.get(i).getmTaskDone());
             }
         }
         setHasOptionsMenu(true);
@@ -77,20 +79,14 @@ public class TaskPagerFragment extends Fragment {
 
         initUI(view);
 
-        mAddFlotingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AddTaskFragment addTaskFragment = AddTaskFragment.newInstance(mViewPager.getCurrentItem());
-                addTaskFragment.show(getFragmentManager(), TAG_ADD_TASK_FRAGMENT);
-            }
-        });
-
         mTabLayout.setupWithViewPager(mViewPager);
 
         mViewPager.setAdapter(new FragmentPagerAdapter(getActivity().getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
-                return TaskListFragment.newInstance(position);
+                TaskListFragment taskListFragment = TaskListFragment.newInstance(position);
+                taskListFragment.setTargetFragment(TaskPagerFragment.this, REQUEST_CODE_TARGET_TASK_PAGER);
+                return taskListFragment;
             }
 
             @Override
@@ -134,11 +130,11 @@ public class TaskPagerFragment extends Fragment {
 
         switch (item.getItemId()) {
             case R.id.menu_log_in: {
-                PersonAndTaskRepository.getInstance().insert(new PersonAndTask(mIDArguman, TaskRepository.getInstance().getmTaskToDo(), TaskRepository.getInstance().getmTaskDoing(), TaskRepository.getInstance().getmTaskDone()));
+                PersonAndTaskRepository.getInstance().insert(new PersonAndTask(mUserID, TaskRepository.getInstance(getActivity()).getmTaskToDo(), TaskRepository.getInstance(getActivity()).getmTaskDoing(), TaskRepository.getInstance(getActivity()).getmTaskDone()));
 
-                TaskRepository.getInstance().setmTaskToDo(mLoginAndTaskRemove);
-                TaskRepository.getInstance().setmTaskDoing(mLoginAndTaskRemove);
-                TaskRepository.getInstance().setmTaskDone(mLoginAndTaskRemove);
+                TaskRepository.getInstance(getActivity()).setmTaskToDo(mLoginAndTaskRemove);
+                TaskRepository.getInstance(getActivity()).setmTaskDoing(mLoginAndTaskRemove);
+                TaskRepository.getInstance(getActivity()).setmTaskDone(mLoginAndTaskRemove);
 
                 getActivity().finish();
             }
@@ -151,7 +147,18 @@ public class TaskPagerFragment extends Fragment {
     private void initUI(View view) {
         mViewPager = view.findViewById(R.id.task_pager_fragment);
         mTabLayout = view.findViewById(R.id.tab_layout);
-        mAddFlotingButton = view.findViewById(R.id.add_floating_button);
+//        mAddFlotingButton = view.findViewById(R.id.add_floating_button);
         mTaskRecyclerView = view.findViewById(R.id.task_recycler_view_fragment);
+    }
+
+    public void notifyAdapter(){
+        mViewPager.getAdapter().notifyDataSetChanged();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        mViewPager.getAdapter().notifyDataSetChanged();
     }
 }

@@ -1,28 +1,43 @@
 package com.example.task.model;
 
-import java.sql.Time;
 import java.util.Date;
 import java.util.UUID;
 
 public class Task{
     private UUID mID;
+    private UUID mUserID;
     private String mTitle;
     private String mDescription;
-    private Date mDate;
-    private Time mTime;
-    private boolean mState;
+    private Date mDate = new Date();
+    private Date mTime = new Date();
     private String mStateRadioButton;
     private String mStateViewPager;
 
-    public Task(String mTitle, String mDescription, Date mDate, boolean mState, String mStateRadioButton , String mStateViewPager) {
-        this.mID = UUID.randomUUID();;
+    public Task() {
+        this(UUID.randomUUID());
+    }
+
+    public Task(UUID mID) {
+        this.mID = mID;
+    }
+
+    public Task(UUID mUserID, String mTitle, String mDescription, Date mDate, Date mTime ,String mStateRadioButton ,String mStateViewPager) {
+//        this.mID = mID;
+        this.mUserID = mUserID;
         this.mTitle = mTitle;
         this.mDescription = mDescription;
         this.mDate = mDate;
-//        this.mTime = mtime;
-        this.mState = mState;
+        this.mTime = mTime;
         this.mStateRadioButton = mStateRadioButton;
         this.mStateViewPager = mStateViewPager;
+    }
+
+    public UUID getmUserID() {
+        return mUserID;
+    }
+
+    public void setmUserID(UUID mUserID) {
+        this.mUserID = mUserID;
     }
 
     public String getmStateRadioButton() {
@@ -64,19 +79,19 @@ public class Task{
         this.mDate = mDate;
     }
 
-    public Time getmTime() {
+    public Date getmTime() {
         return mTime;
     }
 
-    public void setmTime(Time mTime) {
+    public void setmTime(Date mTime) {
         this.mTime = mTime;
     }
 
-    public boolean getmState() {
-        return mState;
+    public String getmStateViewPager() {
+        return mStateViewPager;
     }
 
-    public void setmState(boolean mState) {
-        this.mState = mState;
+    public void setmStateViewPager(String mStateViewPager) {
+        this.mStateViewPager = mStateViewPager;
     }
 }

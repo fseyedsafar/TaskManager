@@ -15,14 +15,13 @@ import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.example.task.R;
-import com.example.task.model.Person;
-import com.example.task.repository.PersonRepository;
+import com.example.task.model.User;
+import com.example.task.repository.UserRepository;
+
+import java.io.Serializable;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,17 +34,18 @@ public class SignUpFragment extends DialogFragment {
     public static final String EXTRA_SIGN_UP_FRAGMENT_PASS = "extraSignUpFragmentPass";
     private EditText mUserEditText;
     private EditText mPassEditText;
+    private User mUser;
 
     public SignUpFragment() {
         // Required empty public constructor
     }
 
-    public static SignUpFragment newInstance(String user, String pass) {
+    public static SignUpFragment newInstance(User user) {
         
         Bundle args = new Bundle();
 
-        args.putSerializable(ARG_SIGN_UP_FRAGMENT_USER, user);
-        args.putSerializable(ARG_SIGN_UP_FRAGMENT_PASS, pass);
+        args.putSerializable(ARG_SIGN_UP_FRAGMENT_USER, (Serializable) user);
+//        args.putSerializable(ARG_SIGN_UP_FRAGMENT_PASS, pass);
         
         SignUpFragment fragment = new SignUpFragment();
         fragment.setArguments(args);
@@ -60,15 +60,18 @@ public class SignUpFragment extends DialogFragment {
 
         initUI(view);
 
-        mUserEditText.setText((String) getArguments().getSerializable(ARG_SIGN_UP_FRAGMENT_USER));
-        mPassEditText.setText((String) getArguments().getSerializable(ARG_SIGN_UP_FRAGMENT_PASS));
+        mUser = (User) getArguments().getSerializable(ARG_SIGN_UP_FRAGMENT_USER);
+        mUserEditText.setText(mUser.getmUser());
+        mPassEditText.setText(mUser.getmPass());
+//        mUserEditText.setText((String) getArguments().getSerializable(ARG_SIGN_UP_FRAGMENT_USER));
+//        mPassEditText.setText((String) getArguments().getSerializable(ARG_SIGN_UP_FRAGMENT_PASS));
 
         return new AlertDialog.Builder(getActivity())
                 .setPositiveButton(R.string.Save, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        if (!(mUserEditText.getText().toString().equals("")) && !(mPassEditText.getText().toString().equals(""))) {
-                            PersonRepository.getInstance().insert(new Person(mUserEditText.getText().toString(), mPassEditText.getText().toString()));
+                        if (!(mUserEditText.getText().toString().equals("")) && !(mPassEditText.getText().toString().equals("")) && (UserRepository.getInstance(getActivity()).search(mUserEditText.getText().toString(), mPassEditText.getText().toString())) != 1) {
+                            UserRepository.getInstance(getActivity()).insert(new User(mUserEditText.getText().toString(), mPassEditText.getText().toString()));
                         }
 
                         Intent intent = new Intent();

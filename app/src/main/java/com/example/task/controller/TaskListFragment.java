@@ -15,7 +15,6 @@ import com.example.task.R;
 import com.example.task.model.Task;
 import com.example.task.repository.TaskRepository;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -67,8 +66,9 @@ public class TaskListFragment extends Fragment {
 
         initUI(view);
 
-        mTask = TaskRepository.getInstance().getTaskList(currentPage);
-
+//        String[] s = {"ToDo"};
+        mTask = TaskRepository.getInstance(getActivity()).getTaskListFromDB(TaskRepository.getInstance(getActivity()).getState(currentPage));
+//        mTask = TaskRepository.getInstance(getActivity()).getTaskListFromDB(s);
         mTaskAdapter = new TaskAdapter(mTask);
 
         if (mTaskAdapter.getItemCount() > 0)
@@ -147,6 +147,10 @@ public class TaskListFragment extends Fragment {
             this.mTask = mTask;
         }
 
+        public void setmTask(List<Task> mTask) {
+            this.mTask = mTask;
+        }
+
         @NonNull
         @Override
         public TaskHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -168,7 +172,10 @@ public class TaskListFragment extends Fragment {
     }
 
     public void notifyAdapter(){
+        mTask = TaskRepository.getInstance(getActivity()).getTaskListFromDB(TaskRepository.getInstance(getActivity()).getState(currentPage));
+        mTaskAdapter.setmTask(mTask);
         mTaskAdapter.notifyDataSetChanged();
+        ((TaskPagerFragment)getTargetFragment()).notifyAdapter();
         if (mTaskAdapter.getItemCount() > 0){
             mTaskImage.setVisibility(View.GONE);
         }
@@ -180,6 +187,7 @@ public class TaskListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
         mTaskAdapter.notifyDataSetChanged();
     }
 }

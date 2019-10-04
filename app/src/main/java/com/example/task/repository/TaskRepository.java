@@ -1,25 +1,52 @@
 package com.example.task.repository;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.CursorWrapper;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.ColorDrawable;
+
 import com.example.task.model.Task;
+import com.example.task.model.database.TaskCursorWrapper;
+import com.example.task.model.database.TaskOpenHelper;
+import static com.example.task.model.database.TaskDataBaseSchema.TaskTable.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class TaskRepository {
 
-    public static final TaskRepository instance = new TaskRepository();
+    public static TaskRepository instance;
     private List<Task> mTask = new ArrayList<>();
     private List<Task> mTaskToDo = new ArrayList<>();
     private List<Task> mTaskDoing = new ArrayList<>();
     private List<Task> mTaskDone = new ArrayList<>();
+    private Context mContext;
+    private SQLiteDatabase mDatabase;
 
-    private TaskRepository() {
+    private TaskRepository(Context context) {
+        mContext = context.getApplicationContext();
+        TaskOpenHelper taskOpenHelper = new TaskOpenHelper(context);
+        mDatabase = taskOpenHelper.getWritableDatabase();
     }
 
-    public static TaskRepository getInstance()
-    {
+    public static TaskRepository getInstance(Context context) {
+
+        if (instance == null){
+            instance = new TaskRepository(context);
+        }
+
         return instance;
     }
+
+//    public List<Task> getmTask() {
+//        return mTask;
+//    }
+//
+//    public void setmTask() {
+//        this.mTask = getTaskListFromDB();
+//    }
 
     public List<Task> getmTaskToDo() {
         return mTaskToDo;
@@ -47,78 +74,224 @@ public class TaskRepository {
 
     public void insert(Task task, String mStateRadioButton , int currentPage){
 
-        if (mStateRadioButton.equals("")){
-            mTask = getTaskList(currentPage);
-        }
-        else {
-            mTask = getTaskList(mStateRadioButton);
-        }
-        mTask.add(task);
+//        if (mStateRadioButton.equals("")){
+//            mTask = getTaskList(currentPage);
+//        }
+//        else {
+//            mTask = getTaskList(mStateRadioButton);
+//        }
+//        mTask.add(task);
+
+        ContentValues values = getContentValues(task);
+        mDatabase.insert(NAME, null, values);
     }
 
-    public void update(Task task, int currentPage){
-        mTask = getTaskList(currentPage);
-        for (int i = 0 ; i < mTask.size() ; i++){
-            if (task.getmID().equals(mTask.get(i).getmID())){
-                mTask.set(i , task);
-            }
-        }
+    public void update(Task task, int currentPage, UUID id){
+//        mTask = getTaskListFromDB(getState(currentPage));
+//        for (int i = 0 ; i < mTask.size() ; i++){
+//            if (task.getmID().equals(mTask.get(i).getmID())){
+//                mTask.set(i , task);
+//            }
+//        }
+        mDatabase.update(NAME, getContentValues(task), Columns.UUID + "=?", new String[]{id.toString()});
     }
 
-    public void delete(Task task, int currentPage){
-        mTask = getTaskList(currentPage);
-        for (int i = 0 ; i < mTask.size() ; i++){
-            if (task.getmID().equals(mTask.get(i).getmID())){
-                mTask.remove(i);
-            }
-        }
+    public void delete(Task task, int currentPage, UUID id){
+//        mTask = getTaskListFromDB(getState(currentPage));
+//        for (int i = 0 ; i < mTask.size() ; i++){
+//            if (task.getmID().equals(mTask.get(i).getmID())){
+//                mTask.remove(i);
+//            }
+//        }
+        mDatabase.delete(NAME,Columns.UUID + "=?", new String[]{id.toString()});
+    }
+
+    public ContentValues getContentValues(Task task){
+        ContentValues values = new ContentValues();
+        values.put(Columns.UUID, task.getmID().toString());
+        values.put(Columns.USER_UUID, task.getmUserID().toString());
+        values.put(Columns.TITLE, task.getmTitle());
+        values.put(Columns.DESCRIPTION, task.getmDescription());
+        values.put(Columns.DATE, task.getmDate().getTime());
+        values.put(Columns.TIME, task.getmTime().getTime());
+        values.put(Columns.STATERADIOBUTTON, task.getmStateRadioButton());
+        values.put(Columns.STATEVIEWPAGER, task.getmStateViewPager());
+
+//        values.put(Columns.UUID, "_id");
+//        values.put(Columns.TITLE, "title");
+//        values.put(Columns.DESCRIPTION, "des");
+//        values.put(Columns.DATE, "date");
+//        values.put(Columns.TIME, "time");
+//        values.put(Columns.STATERADIOBUTTON, "ToDo");
+//        values.put(Columns.STATEVIEWPAGER, "ToDo");
+
+        return values;
     }
 
     public Task getTask(UUID id, int currentPage){
-        mTask = getTaskList(currentPage);
-        for (Task task : mTask) {
-            if (task.getmID().equals(id)){
-                return task;
+//        mTask = getTaskListFromDB(getState(currentPage));
+//        for (Task task : mTask) {
+//            if (task.getmID().equals(id)){
+//                return task;
+//            }
+//        }
+//        return null;
+
+        TaskCursorWrapper cursor = (TaskCursorWrapper) queryTaskUUID(new String[]{id.toString()});
+        try {
+            cursor.moveToFirst();
+
+            if (cursor == null || cursor.getCount() == 0){
+                return null;
             }
+
+            return cursor.getTask();
+
+        }finally {
+            cursor.close();
         }
-        return null;
     }
 
-    public List<Task> getTaskList(String mStateRadioButton){
-        List<Task> mTask = null;
-        switch (mStateRadioButton){
-            case "ToDo":{
-                mTask = getmTaskToDo();
-                break;
+    public List<Task> getTaskListFromDB(String[] state){
+        List<Task> taskList = new ArrayList<>();
+
+        TaskCursorWrapper cursor = (TaskCursorWrapper) queryTaskState(state);
+
+        try {
+            cursor.moveToFirst();
+
+            while (!cursor.isAfterLast()) {
+                taskList.add(cursor.getTask());
+
+                cursor.moveToNext();
             }
-            case "Doing":{
-                mTask = getmTaskDoing();
-                break;
-            }
-            case "Done":{
-                mTask = getmTaskDone();
-                break;
-            }
+
+////                String stringUUID = cursor.getString(cursor.getColumnIndex(Columns.UUID));
+//                String title = cursor.getString(cursor.getColumnIndex(Columns.TITLE));
+//                String description = cursor.getString(cursor.getColumnIndex(Columns.DESCRIPTION));
+//                Long stringDate = cursor.getLong(cursor.getColumnIndex(Columns.DATE));
+//                Long stringTime = cursor.getLong(cursor.getColumnIndex(Columns.TIME));
+//                String stateRadioButton = cursor.getString(cursor.getColumnIndex(Columns.STATERADIOBUTTON));
+//                String stateViewPager = cursor.getString(cursor.getColumnIndex(Columns.STATEVIEWPAGER));
+//
+////                UUID ID = java.util.UUID.fromString(stringUUID);
+//                Date date = new Date(stringDate);
+//                Date time = new Date(stringTime);
+//
+//                Task task = new Task(title, description, date, time, stateRadioButton, stateViewPager);
+//                taskList.add(task)
         }
-        return mTask;
+        finally {
+            cursor.close();
+        }
+
+        return taskList;
     }
 
-    public List<Task> getTaskList(int currentPage){
-        List<Task> mTask = null;
+    public String[] getState(int currentPage){
+        String[] state = new String[3];
         switch (currentPage){
             case 0:{
-                mTask = getmTaskToDo();
+                state[0] = state[1] = "ToDo";
+//                state[1] = "ToDo";
+//                state[2] = "ToDo";
                 break;
             }
             case 1:{
-                mTask = getmTaskDoing();
+                state[0] = state[1] = "Doing";
+//                state[1] = "Doing";
                 break;
             }
             case 2:{
-                mTask = getmTaskDone();
+                state[0] = state[1] = "Done";
+//                state[1] = "Done1";
                 break;
             }
         }
-        return mTask;
+        state[2] = "";
+        return state;
     }
+
+    private CursorWrapper queryTaskUUID(String[] id){
+        Cursor cursor = mDatabase.query(NAME,
+                null,
+                Columns.UUID + "=?",
+                id,
+                null,
+                null,
+                null);
+
+        return new TaskCursorWrapper(cursor);
+    }
+
+    private CursorWrapper queryTaskState(String[] state){
+
+        Cursor cursor = mDatabase.query(NAME,
+                null,
+                (Columns.STATERADIOBUTTON + "=?") + " or " + (Columns.STATEVIEWPAGER + "=? and " + Columns.STATERADIOBUTTON + "=?"),
+                state,
+                null,
+                null,
+                null);
+
+        return new  TaskCursorWrapper(cursor);
+    }
+
+    public String setState(int currentPage){
+        String state = "";
+        switch (currentPage){
+            case 0: {
+                state = "ToDo";
+                break;
+            }
+            case 1: {
+                state = "Doing";
+                break;
+            }
+            case 2: {
+                state = "Done";
+                break;
+            }
+        }
+        return state;
+    }
+
+
+//    public List<Task> getTaskList(String mStateRadioButton){
+//        List<Task> mTask = null;
+//        switch (mStateRadioButton){
+//            case "ToDo":{
+//                mTask = getmTaskToDo();
+//                break;
+//            }
+//            case "Doing":{
+//                mTask = getmTaskDoing();
+//                break;
+//            }
+//            case "Done":{
+//                mTask = getmTaskDone();
+//                break;
+//            }
+//        }
+//        return mTask;
+//    }
+
+//    public List<Task> getTaskList(int currentPage){
+//        List<Task> mTask = null;
+//        switch (currentPage){
+//            case 0:{
+//                mTask = getmTaskToDo();
+//                break;
+//            }
+//            case 1:{
+//                mTask = getmTaskDoing();
+//                break;
+//            }
+//            case 2:{
+//                mTask = getmTaskDone();
+//                break;
+//            }
+//        }
+//        return mTask;
+//    }
 }

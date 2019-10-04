@@ -11,8 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.example.task.R;
-import com.example.task.model.Person;
-import com.example.task.repository.PersonRepository;
+import com.example.task.model.User;
+import com.example.task.repository.UserRepository;
 import java.util.UUID;
 
 
@@ -28,6 +28,7 @@ public class LoginFragment extends Fragment {
     private EditText mPassEditText;
     private Button mButtonLogIn;
     private Button mButtonSignUp;
+    private User mUser = new User();
 
     public LoginFragment() {
         // Required empty public constructor
@@ -58,10 +59,10 @@ public class LoginFragment extends Fragment {
                 }
                 else {
                     int result;
-                    result = PersonRepository.getInstance().search(mUserEditText.getText().toString(), mPassEditText.getText().toString());
+                    result = UserRepository.getInstance(getActivity()).search(mUserEditText.getText().toString(), mPassEditText.getText().toString());
                     switch (result) {
                         case 1: {
-                            Person person = PersonRepository.getInstance().getPerson(mUserEditText.getText().toString(), mPassEditText.getText().toString());
+                            User person = UserRepository.getInstance(getActivity()).getPerson(mUserEditText.getText().toString(), mPassEditText.getText().toString());
                             UUID id = person.getmID();
 
                             Intent intent = TaskPagerActivity.newIntent(getActivity());
@@ -89,7 +90,9 @@ public class LoginFragment extends Fragment {
         mButtonSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SignUpFragment signUpFragment = SignUpFragment.newInstance(mUserEditText.getText().toString(), mPassEditText.getText().toString());
+                mUser.setmUser(mUserEditText.getText().toString());
+                mUser.setmPass(mPassEditText.getText().toString());
+                SignUpFragment signUpFragment = SignUpFragment.newInstance(mUser);
                 signUpFragment.setTargetFragment(LoginFragment.this, REQUEST_CODE_LOG_IN_FRAGMENT);
                 signUpFragment.show(getFragmentManager(), TAG_SIGN_UP_FRAGMENT);
             }

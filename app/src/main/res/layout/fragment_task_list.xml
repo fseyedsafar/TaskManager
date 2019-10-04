@@ -1,16 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".controller.TaskListFragment"
-    android:layout_height="match_parent"
+    android:id="@+id/frame_layout_recycler"
     android:layout_width="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent"
+    android:background="#fff"
+    android:orientation="vertical"
+    tools:context=".controller.TaskListFragment">
+
+    <ImageView
+        android:id="@+id/task_image"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:background="@drawable/empty">
+
+    </ImageView>
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/task_recycler_view_fragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content" />
 
-</LinearLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_floating_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="8dp"
+        android:background="@drawable/new_photo"
+        android:foregroundGravity="bottom"
+        android:hapticFeedbackEnabled="false"
+        android:src="@drawable/ic_action_add"
+        android:text="ok"
+        app:backgroundTint="@color/colorPLight"
+        app:maxImageSize="50dp" />
+
+</FrameLayout>

@@ -6,7 +6,7 @@
         android:shape="rectangle">
         <stroke
             android:width="3dp"
-            android:color="@color/colorPink" />
+            android:color="@color/colorGreen" />
     </shape>
 
 <!--</selector>-->
