@@ -21,6 +21,7 @@ import com.example.task.model.Task;
 import com.example.task.repository.TaskRepository;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,31 +34,34 @@ public class AddTaskFragment extends DialogFragment {
     public static final String ARG_CURRENT_PAGE_ADD_TASK = "argCurrentPageAddTask";
     public static final int REQUEST_CODE_TIME_PICKER = 1;
     public static final String BOUNDLE_ADD_TASK_FRAGMENT_DATE = "boundleAddTaskFragmentDate";
+    public static final String ARG_USER_ID_ADD_TASK = "argUserIdAddTask";
     private EditText mTitle;
     private EditText mDescription;
     private Button mDateButton;
     private Button mTimeButton;
-    private Task mTask = new Task();
-    private int currentPage;
-    private Date mDate = new Date();
-    private Date mTime;
-    private String mTemp = "";
-    private RadioGroup mRadioGroup;
     private RadioButton getmRadioButtonTask;
     private RadioButton mRadioButtonToDo;
     private RadioButton mRadioButtonDoing;
     private RadioButton mRadioButtonDone;
+    private Task mTask = new Task();
+    private int currentPage;
+    private Date mDate = new Date();
+    private Date mTime = new Date();
+    private String mTemp = "";
+    private RadioGroup mRadioGroup;
+    private UUID mUserID;
 
 
     public AddTaskFragment() {
         // Required empty public constructor
     }
 
-    public static AddTaskFragment newInstance(int currentPage) {
+    public static AddTaskFragment newInstance(int currentPage, UUID userID) {
         
         Bundle args = new Bundle();
 
         args.putSerializable(ARG_CURRENT_PAGE_ADD_TASK, currentPage);
+        args.putSerializable(ARG_USER_ID_ADD_TASK, userID);
 
         AddTaskFragment fragment = new AddTaskFragment();
         fragment.setArguments(args);
@@ -73,13 +77,7 @@ public class AddTaskFragment extends DialogFragment {
         }
 
         currentPage = (int) getArguments().getSerializable(ARG_CURRENT_PAGE_ADD_TASK);
-
-//        if (mTask.getmDate() == null) {
-//            mTask.setmDate(new Date());
-//        }
-//        if (mTask.getmTime() == null) {
-//            mTask.setmTime(new Date());
-//        }
+        mUserID = (UUID) getArguments().getSerializable(ARG_USER_ID_ADD_TASK);
     }
 
     @Override
@@ -101,6 +99,30 @@ public class AddTaskFragment extends DialogFragment {
             mDateButton.setText(mTemp);
         }
 
+        initListener();
+
+        return new AlertDialog.Builder(getActivity())
+                .setPositiveButton(R.string.Save, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        mTask.setmUserID(mUserID);
+                        mTask.setmTitle(mTitle.getText().toString());
+                        mTask.setmDescription(mDescription.getText().toString());
+                        mTask.setmDate(mDate);
+                        mTask.setmTime(mTime);
+                        mTask.setmStateRadioButton(getRadioButtonChecked());
+                        mTask.setmStateViewPager(TaskRepository.getInstance(getActivity()).setState(currentPage));
+                        TaskRepository.getInstance(getActivity()).insert(mTask,getRadioButtonChecked() ,currentPage);
+
+                        ((TaskListFragment) getTargetFragment()).notifyAdapter();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .setView(view)
+                .create();
+    }
+
+    private void initListener() {
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -118,27 +140,6 @@ public class AddTaskFragment extends DialogFragment {
                 timePickerFragment.show(getFragmentManager(), TAG_TIME_PICKER_FRAGMENT);
             }
         });
-
-        return new AlertDialog.Builder(getActivity())
-                .setPositiveButton(R.string.Save, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        mTask = new Task(mTitle.getText().toString(), mDescription.getText().toString(),mDate ,getRadioButtonChecked(),setState(currentPage));
-                        mTask.setmUserID(TaskPagerFragment.mUserID);
-                        mTask.setmTitle(mTitle.getText().toString());
-                        mTask.setmDescription(mDescription.getText().toString());
-                        mTask.setmDate(mDate);
-                        mTask.setmTime(mTime);
-                        mTask.setmStateRadioButton(getRadioButtonChecked());
-                        mTask.setmStateViewPager(TaskRepository.getInstance(getActivity()).setState(currentPage));
-                        TaskRepository.getInstance(getActivity()).insert(mTask,getRadioButtonChecked() ,currentPage);
-
-                        ((TaskListFragment) getTargetFragment()).notifyAdapter();
-                    }
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .setView(view)
-                .create();
     }
 
     private String getRadioButtonChecked(){
@@ -185,12 +186,8 @@ public class AddTaskFragment extends DialogFragment {
         if (requestCode == REQUEST_CODE_DATE_PICKER && data != null){
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_TASK_DATE);
 
-//            if (data.equals(null)){
-//                mDate = new Date();
-//            }
-//            else {
-                mDate = date;
-//            }
+            mDate = date;
+            mTask.setmDate(mDate);
 
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
             String dateString = simpleDateFormat.format(mDate);
@@ -200,37 +197,12 @@ public class AddTaskFragment extends DialogFragment {
         if (requestCode == REQUEST_CODE_TIME_PICKER && data != null){
             Date time = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TASK_TIME);
 
-//            if (data.equals(null)){
-//                mTime = new Date();
-//            }
-//            else {
                 mTime = time;
+                mTask.setmTime(mTime);
 
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm");
                 String dateString = simpleDateFormat.format(mTime);
                 mTimeButton.setText(dateString);
-
-//                mTimeButton.setText(mTime.toString());
-//            }
         }
     }
-
-//    public String setState(int currentPage){
-//        String state = "";
-//        switch (currentPage){
-//            case 0: {
-//                state = "ToDo";
-//                break;
-//            }
-//            case 1: {
-//                state = "Doing";
-//                break;
-//            }
-//            case 2: {
-//                state = "Done";
-//                break;
-//            }
-//        }
-//        return state;
-//    }
 }

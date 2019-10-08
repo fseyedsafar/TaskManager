@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.example.task.R;
-import com.example.task.model.User;
 import com.example.task.repository.UserRepository;
 import java.util.UUID;
 
@@ -28,7 +27,6 @@ public class LoginFragment extends Fragment {
     private EditText mPassEditText;
     private Button mButtonLogIn;
     private Button mButtonSignUp;
-    private User mUser = new User();
 
     public LoginFragment() {
         // Required empty public constructor
@@ -51,37 +49,34 @@ public class LoginFragment extends Fragment {
 
         init(view);
 
+        initListener();
+
+        return view;
+    }
+
+    private void initListener() {
         mButtonLogIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mUserEditText.getText().toString().equals("") || mPassEditText.getText().toString().equals("")){
-                    Toast.makeText(getActivity(), "please sign up", Toast.LENGTH_SHORT).show();
+                if (mUserEditText.getText().toString().equals("") && mPassEditText.getText().toString().equals("")){
+                    Toast.makeText(getActivity(), "please insert user & pass", Toast.LENGTH_SHORT).show();
                 }
-                else {
-                    int result;
-                    result = UserRepository.getInstance(getActivity()).search(mUserEditText.getText().toString(), mPassEditText.getText().toString());
-                    switch (result) {
-                        case 1: {
-                            User person = UserRepository.getInstance(getActivity()).getPerson(mUserEditText.getText().toString(), mPassEditText.getText().toString());
-                            UUID id = person.getmID();
+                else if (mUserEditText.getText().toString().equals("")){
+                    Toast.makeText(getActivity(), "please insert user", Toast.LENGTH_SHORT).show();
+                }
+                else if (mPassEditText.getText().toString().equals("")){
+                    Toast.makeText(getActivity(), "please insert pass", Toast.LENGTH_SHORT).show();
+                }
 
-                            Intent intent = TaskPagerActivity.newIntent(getActivity());
-                            intent.putExtra(EXTRA_LOGIN_FRAGMENT_ID, id);
-                            startActivity(intent);
-                            break;
-                        }
-                        case 2: {
-                            Toast.makeText(getActivity(), "Your Password Is Error", Toast.LENGTH_SHORT).show();
-                            break;
-                        }
-                        case 3: {
-                            Toast.makeText(getActivity(), "Your User Is Error", Toast.LENGTH_SHORT).show();
-                            break;
-                        }
-                        default: {
-                            Toast.makeText(getActivity(), "Please Sign Up", Toast.LENGTH_SHORT).show();
-                            break;
-                        }
+                if (!(mUserEditText.getText().toString().equals("")) && !((mPassEditText.getText().toString().equals("")))){
+                    if (UserRepository.getInstance(getActivity()).searchUserPass(mUserEditText.getText().toString(), mPassEditText.getText().toString()) == "not exist"){
+                        Toast.makeText(getActivity(), "please signUp", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (UserRepository.getInstance(getActivity()).searchUserPass(mUserEditText.getText().toString(), mPassEditText.getText().toString()) == "exist"){
+                        UUID id = UserRepository.getInstance(getActivity()).getUUID(mUserEditText.getText().toString(), mPassEditText.getText().toString());
+                        Intent intent = TaskPagerActivity.newIntent(getActivity());
+                        intent.putExtra(EXTRA_LOGIN_FRAGMENT_ID, id);
+                        startActivity(intent);
                     }
                 }
             }
@@ -90,14 +85,11 @@ public class LoginFragment extends Fragment {
         mButtonSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mUser.setmUser(mUserEditText.getText().toString());
-                mUser.setmPass(mPassEditText.getText().toString());
-                SignUpFragment signUpFragment = SignUpFragment.newInstance(mUser);
+                SignUpFragment signUpFragment = SignUpFragment.newInstance(mUserEditText.getText().toString(), mPassEditText.getText().toString());
                 signUpFragment.setTargetFragment(LoginFragment.this, REQUEST_CODE_LOG_IN_FRAGMENT);
                 signUpFragment.show(getFragmentManager(), TAG_SIGN_UP_FRAGMENT);
             }
         });
-        return view;
     }
 
     @Override
@@ -119,5 +111,4 @@ public class LoginFragment extends Fragment {
         mButtonLogIn = view.findViewById(R.id.buttonLogin_login_fragment);
         mButtonSignUp = view.findViewById(R.id.buttonSignUp_login_fragment);
     }
-
 }

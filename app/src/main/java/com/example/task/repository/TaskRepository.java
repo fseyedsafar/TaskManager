@@ -7,6 +7,7 @@ import android.database.CursorWrapper;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
 
+import com.example.task.controller.TaskPagerFragment;
 import com.example.task.model.Task;
 import com.example.task.model.database.TaskCursorWrapper;
 import com.example.task.model.database.TaskOpenHelper;
@@ -152,10 +153,49 @@ public class TaskRepository {
         }
     }
 
-    public List<Task> getTaskListFromDB(String[] state){
+    public List<Task> getTaskListFromDB(String[] state, UUID userID){
         List<Task> taskList = new ArrayList<>();
 
         TaskCursorWrapper cursor = (TaskCursorWrapper) queryTaskState(state);
+
+        try {
+            cursor.moveToFirst();
+
+            while (!cursor.isAfterLast()) {
+
+                if (cursor.getTask().getmUserID().equals(userID)) {
+                    taskList.add(cursor.getTask());
+                }
+
+                cursor.moveToNext();
+            }
+
+////                String stringUUID = cursor.getString(cursor.getColumnIndex(Columns.UUID));
+//                String title = cursor.getString(cursor.getColumnIndex(Columns.TITLE));
+//                String description = cursor.getString(cursor.getColumnIndex(Columns.DESCRIPTION));
+//                Long stringDate = cursor.getLong(cursor.getColumnIndex(Columns.DATE));
+//                Long stringTime = cursor.getLong(cursor.getColumnIndex(Columns.TIME));
+//                String stateRadioButton = cursor.getString(cursor.getColumnIndex(Columns.STATERADIOBUTTON));
+//                String stateViewPager = cursor.getString(cursor.getColumnIndex(Columns.STATEVIEWPAGER));
+//
+////                UUID ID = java.util.UUID.fromString(stringUUID);
+//                Date date = new Date(stringDate);
+//                Date time = new Date(stringTime);
+//
+//                Task task = new Task(title, description, date, time, stateRadioButton, stateViewPager);
+//                taskList.add(task)
+        }
+        finally {
+            cursor.close();
+        }
+
+        return taskList;
+    }
+
+    public List<Task> getAllTask(String[] userID){
+        List<Task> taskList = new ArrayList<>();
+
+        TaskCursorWrapper cursor = (TaskCursorWrapper) queryAllTask(userID);
 
         try {
             cursor.moveToFirst();
@@ -188,7 +228,7 @@ public class TaskRepository {
         return taskList;
     }
 
-    public String[] getState(int currentPage){
+    public String[] getState(int currentPage, UUID mUserID){
         String[] state = new String[3];
         switch (currentPage){
             case 0:{
@@ -208,6 +248,7 @@ public class TaskRepository {
                 break;
             }
         }
+//        state[0] = mUserID.toString();
         state[2] = "";
         return state;
     }
@@ -217,6 +258,18 @@ public class TaskRepository {
                 null,
                 Columns.UUID + "=?",
                 id,
+                null,
+                null,
+                null);
+
+        return new TaskCursorWrapper(cursor);
+    }
+
+    private CursorWrapper queryAllTask(String[] userID){
+        Cursor cursor = mDatabase.query(NAME,
+                null,
+                Columns.USER_UUID + "=?",
+                userID,
                 null,
                 null,
                 null);
@@ -234,7 +287,7 @@ public class TaskRepository {
                 null,
                 null);
 
-        return new  TaskCursorWrapper(cursor);
+        return new TaskCursorWrapper(cursor);
     }
 
     public String setState(int currentPage){

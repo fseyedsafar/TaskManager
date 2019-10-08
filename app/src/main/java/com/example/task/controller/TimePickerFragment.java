@@ -29,7 +29,6 @@ public class TimePickerFragment extends DialogFragment {
     public static final String ARG_TIME_PICKER_TIME = "argTimePickerTime";
     public static final String EXTRA_TASK_TIME = "extraTaskTime";
     private TimePicker mTimePicker;
-//    private String mTime;
     private Date mTime;
 
     public TimePickerFragment() {
@@ -84,7 +83,6 @@ public class TimePickerFragment extends DialogFragment {
 
         int hour = calendar.get(Calendar.HOUR);
         int minute = calendar.get(Calendar.MINUTE);
-//        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
         mTimePicker.setHour(hour);
         mTimePicker.setMinute(minute);

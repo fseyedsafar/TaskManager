@@ -42,7 +42,11 @@ public class EditTaskFragment extends DialogFragment {
     private EditText mDescription;
     private Button mDateButton;
     private Button mTimeButton;
-    private CheckBox mState;
+    private RadioGroup mRadioGroup;
+    private RadioButton getmRadioButtonTask;
+    private RadioButton mRadioButtonToDo;
+    private RadioButton mRadioButtonDoing;
+    private RadioButton mRadioButtonDone;
     private UUID id;
     private int currentPage;
     private Task mTask;
@@ -50,11 +54,7 @@ public class EditTaskFragment extends DialogFragment {
     private Date mTime;
     private String mTemp = "";
     private String mStateRadioButton;
-    private RadioGroup mRadioGroup;
-    private RadioButton getmRadioButtonTask;
-    private RadioButton mRadioButtonToDo;
-    private RadioButton mRadioButtonDoing;
-    private RadioButton mRadioButtonDone;
+
 
     public EditTaskFragment() {
         // Required empty public constructor
@@ -76,6 +76,11 @@ public class EditTaskFragment extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        initValue(savedInstanceState);
+    }
+
+    private void initValue(@Nullable Bundle savedInstanceState) {
+
         if (savedInstanceState != null){
             mTemp = (String) savedInstanceState.get(BOUNDLE_EDIT_TASK_FRAGMENT_DATE);
         }
@@ -83,7 +88,8 @@ public class EditTaskFragment extends DialogFragment {
         currentPage = (int) getArguments().getSerializable(ARG_CURRENT_PAGE_EDIT_TEXT);
         id = (UUID) getArguments().getSerializable(ARG_ID_EDIT_TASK);
         mTask = TaskRepository.getInstance(getActivity()).getTask(id, currentPage);
-
+        mDate = mTask.getmDate();
+        mTime = mTask.getmTime();
         mStateRadioButton = mTask.getmStateRadioButton();
     }
 
@@ -94,26 +100,10 @@ public class EditTaskFragment extends DialogFragment {
         View view = layoutInflater.inflate(R.layout.fragment_detail_task, null , false);
 
         initUI(view);
-//            mDateButton.setText(mTemp);
+
         setUI();
 
-        mDateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DatePickerFragment datePickerFragment = DatePickerFragment.newInstance(mTask.getmDate());
-                datePickerFragment.setTargetFragment(EditTaskFragment.this, REQUEST_CODE_DATE_PICKER);
-                datePickerFragment.show(getFragmentManager(), TAG_DATE_PICKER_FRAGMENT);
-            }
-        });
-
-        mTimeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                TimePickerFragment timePickerFragment = TimePickerFragment.newInstance(mTask.getmTime());
-                timePickerFragment.setTargetFragment(EditTaskFragment.this, REQUEST_CODE_TIME_PICKER);
-                timePickerFragment.show(getFragmentManager(), TAG_TIME_PICKER_FRAGMENT);
-            }
-        });
+        initListener();
 
         return new AlertDialog.Builder(getActivity())
                 .setNegativeButton(R.string.Edit, new DialogInterface.OnClickListener() {
@@ -135,17 +125,27 @@ public class EditTaskFragment extends DialogFragment {
                 .create();
     }
 
-    private void initUpdateTask() {
-//        if (!(mStateRadioButton.equals(getRadioButtonChecked()))){
-//            mTask.setmStateRadioButton(getRadioButtonChecked());
-//            TaskRepository.getInstance(getActivity()).insert(mTask, getRadioButtonChecked(), currentPage);
-//            TaskRepository.getInstance(getActivity()).delete(mTask, currentPage);
-//        }
-//        if (mStateRadioButton.equals(getRadioButtonChecked())){
-//            mTask.setmTitle(mTitle.getText().toString());
-//            mTask.setmDescription(mDescription.getText().toString());
-//            mTask.setmDate(mDate);
+    private void initListener() {
+        mDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatePickerFragment datePickerFragment = DatePickerFragment.newInstance(mTask.getmDate());
+                datePickerFragment.setTargetFragment(EditTaskFragment.this, REQUEST_CODE_DATE_PICKER);
+                datePickerFragment.show(getFragmentManager(), TAG_DATE_PICKER_FRAGMENT);
+            }
+        });
 
+        mTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                TimePickerFragment timePickerFragment = TimePickerFragment.newInstance(mTask.getmTime());
+                timePickerFragment.setTargetFragment(EditTaskFragment.this, REQUEST_CODE_TIME_PICKER);
+                timePickerFragment.show(getFragmentManager(), TAG_TIME_PICKER_FRAGMENT);
+            }
+        });
+    }
+
+    private void initUpdateTask() {
         mTask.setmTitle(mTitle.getText().toString());
         mTask.setmDescription(mDescription.getText().toString());
         mTask.setmDate(mDate);
@@ -153,7 +153,6 @@ public class EditTaskFragment extends DialogFragment {
         mTask.setmStateRadioButton(getRadioButtonChecked());
         mTask.setmStateViewPager(TaskRepository.getInstance(getActivity()).setState(currentPage));
         TaskRepository.getInstance(getActivity()).update(mTask, currentPage, mTask.getmID());
-//        }
     }
 
     @Override
@@ -225,6 +224,7 @@ public class EditTaskFragment extends DialogFragment {
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_TASK_DATE);
 
             mDate = date;
+            mTask.setmDate(mDate);
 
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
             String dateString = simpleDateFormat.format(date);
@@ -233,18 +233,12 @@ public class EditTaskFragment extends DialogFragment {
         if (requestCode == REQUEST_CODE_TIME_PICKER){
             Date date = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TASK_TIME);
 
-            if (data.equals(null)){
-                mTime = new Date();
-            }
-            else {
                 mTime = date;
+                mTask.setmTime(mTime);
 
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm");
                 String dateString = simpleDateFormat.format(mTime);
                 mTimeButton.setText(dateString);
-
-//                mTimeButton.setText(mTime.toString());
-            }
         }
     }
 }
