@@ -30,7 +30,7 @@
                 android:scaleType="centerInside"
                 app:srcCompat="@drawable/task" />
 
-            <com.google.android.material.textfield.TextInputEditText
+            <EditText
                 android:id="@+id/textUser_login_fragment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
                 android:textColor="#FFFFFF"
                 android:textColorHint="#FFFFFF" />
 
-            <com.google.android.material.textfield.TextInputEditText
+            <EditText
                 android:id="@+id/textPass_login_fragment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -58,14 +58,14 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <com.google.android.material.button.MaterialButton
+                <Button
                     android:id="@+id/buttonSignUp_login_fragment"
                     android:layout_width="112dp"
                     android:layout_height="wrap_content"
                     android:text="@string/sign_up"
                     android:textSize="18sp" />
 
-                <com.google.android.material.button.MaterialButton
+                <Button
                     android:id="@+id/buttonLogin_login_fragment"
                     android:layout_width="114dp"
                     android:layout_height="wrap_content"

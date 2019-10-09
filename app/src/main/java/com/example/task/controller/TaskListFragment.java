@@ -211,7 +211,7 @@ public class TaskListFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        notifyAdapter();
+        //notifyAdapter();
         mTaskAdapter.notifyDataSetChanged();
     }
 

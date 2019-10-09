@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -29,6 +31,7 @@ public class TaskPagerFragment extends Fragment {
     private UUID mUserID;
     private List<PersonAndTask> mLoginAndTask;
     private int mCurrentPage;
+    private FragmentPagerAdapter adapter;
 
     public TaskPagerFragment() {
         // Required empty public constructor
@@ -63,7 +66,13 @@ public class TaskPagerFragment extends Fragment {
 
         mTabLayout.setupWithViewPager(mViewPager);
 
-        mViewPager.setAdapter(new FragmentPagerAdapter(getActivity().getSupportFragmentManager()) {
+        mViewPager.setAdapter(adapter = new FragmentPagerAdapter(getActivity().getSupportFragmentManager()) {
+
+            @Override
+            public int getItemPosition(@NonNull Object object) {
+                return POSITION_NONE;
+            }
+
             @Override
             public Fragment getItem(int position) {
                 mCurrentPage = position;
@@ -108,7 +117,8 @@ public class TaskPagerFragment extends Fragment {
     }
 
     public void notifyAdapter(){
-        mViewPager.getAdapter().notifyDataSetChanged();
+       if (adapter != null)
+        adapter.notifyDataSetChanged();
     }
 
     @Override
