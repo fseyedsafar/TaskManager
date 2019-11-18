@@ -9,6 +9,12 @@
         app:actionViewClass="android.widget.SearchView"
         app:showAsAction="always" />
 
+<!--    <item-->
+<!--        android:id="@+id/menu_users"-->
+<!--        android:icon="@drawable/baseline_people_white_18dp"-->
+<!--        android:title="LogOut"-->
+<!--        app:showAsAction="always" />-->
+
     <item
         android:id="@+id/menu_log_in"
         android:icon="@drawable/logout"

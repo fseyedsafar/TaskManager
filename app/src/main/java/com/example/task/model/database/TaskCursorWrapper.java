@@ -22,8 +22,8 @@ public class TaskCursorWrapper extends CursorWrapper {
         String description = getString(getColumnIndex(TaskDataBaseSchema.TaskTable.Columns.DESCRIPTION));
         Long stringDate = getLong(getColumnIndex(TaskDataBaseSchema.TaskTable.Columns.DATE));
         Long stringTime = getLong(getColumnIndex(TaskDataBaseSchema.TaskTable.Columns.TIME));
-        String stateRadioButton = getString(getColumnIndex(TaskDataBaseSchema.TaskTable.Columns.STATERADIOBUTTON));
-        String stateViewPager = getString(getColumnIndex(TaskDataBaseSchema.TaskTable.Columns.STATEVIEWPAGER));
+        String stateRadioButton = getString(getColumnIndex(TaskDataBaseSchema.TaskTable.Columns.STATE_RADIO_BUTTON));
+        String stateViewPager = getString(getColumnIndex(TaskDataBaseSchema.TaskTable.Columns.STATE_VIEW_PAGER));
 
         UUID ID = java.util.UUID.fromString(stringUUID);
         UUID userUUID = java.util.UUID.fromString(stringUserUUID);

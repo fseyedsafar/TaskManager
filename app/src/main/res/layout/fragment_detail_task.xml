@@ -16,6 +16,15 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/text_view_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="@string/username_in_list"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right|left"
@@ -47,21 +56,30 @@
             android:ems="10"
             android:inputType="textPersonName" />
 
-        <Button
-            android:id="@+id/date_button"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/date"
-            android:textColor="#030303"
-            android:textSize="20sp" />
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/time_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/time"
-            android:textColor="#070707"
-            android:textSize="20sp" />
+            <Button
+                android:id="@+id/date_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/date"
+                android:textColor="#030303"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/time_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/time"
+                android:textColor="#070707"
+                android:textSize="14sp" />
+
+        </LinearLayout>
 
         <RadioGroup
             android:id="@+id/radio_group"
@@ -89,6 +107,13 @@
 
 
         </RadioGroup>
+
+        <Button
+            android:id="@+id/share_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sharetask"
+            android:textSize="24sp" />
 
     </LinearLayout>
 

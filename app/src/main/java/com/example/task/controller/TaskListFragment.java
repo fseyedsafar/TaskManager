@@ -1,5 +1,6 @@
 package com.example.task.controller;
 
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import com.example.task.R;
 import com.example.task.model.Task;
 import com.example.task.repository.TaskRepository;
+import com.example.task.repository.UserRepository;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,7 +40,10 @@ public class TaskListFragment extends Fragment {
     public static final String FRAGMENT_ADD_TASK = "fragmentAddTask";
     public static final int REQUEST_CODE_TASK_LIST_EDIT = 2;
     public static final String ARG_USER_ID_TASK_LIST = "argUserIDTaskList";
+    public static final String TAG_USER_LIST_FRAGMENT = "tagUserListFragment";
+    public static final int REQUEST_CODE_TASK_LIST_FRAGMENT = 7;
     private RecyclerView mRecyclerView;
+    private MenuItem menuItem;
     private TextView mDateTimeTextView;
     private ImageView mTaskImage;
     private FloatingActionButton mAddFlotingButton;
@@ -56,10 +61,6 @@ public class TaskListFragment extends Fragment {
         TaskListFragment fragment = new TaskListFragment();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public TaskListFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -88,7 +89,13 @@ public class TaskListFragment extends Fragment {
     }
 
     private void initRecyclerView() {
-        mTask = TaskRepository.getInstance(getActivity()).getTaskListFromDB(TaskRepository.getInstance(getActivity()).getState(currentPage, mUserID), mUserID);
+
+        if (UserRepository.getInstance(getActivity()).isAdmin(mUserID)) {
+            mTask = TaskRepository.getInstance(getActivity()).getTaskListFromDBForAdmin(TaskRepository.getInstance(getActivity()).getState(currentPage));
+        } else {
+            mTask = TaskRepository.getInstance(getActivity()).getTaskListFromDBForUser(TaskRepository.getInstance(getActivity()).getState(currentPage), mUserID);
+        }
+
         mTaskAdapter = new TaskAdapter(mTask);
 
         if (mTaskAdapter.getItemCount() > 0)
@@ -108,11 +115,29 @@ public class TaskListFragment extends Fragment {
         });
     }
 
+    @SuppressLint("RestrictedApi")
     private void initUI(View view) {
         mRecyclerView = view.findViewById(R.id.task_recycler_view_fragment);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAddFlotingButton = view.findViewById(R.id.add_floating_button);
         mTaskImage = view.findViewById(R.id.task_image);
+        menuItem = view.findViewById(R.id.menu_users);
+
+        if (UserRepository.getInstance(getActivity()).isAdmin(mUserID) == true){
+            mAddFlotingButton.setVisibility(View.GONE);
+        } else{
+            mAddFlotingButton.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menuItem = menu.findItem(R.id.menu_users);
+        if (UserRepository.getInstance(getActivity()).isAdmin(mUserID) == true){
+            menuItem.setVisible(true);
+        } else{
+            menuItem.setVisible(false);
+        }
     }
 
     private class TaskHolder extends RecyclerView.ViewHolder{
@@ -189,7 +214,15 @@ public class TaskListFragment extends Fragment {
     }
 
     public void notifyAdapter(){
-        mTask = TaskRepository.getInstance(getActivity()).getTaskListFromDB(TaskRepository.getInstance(getActivity()).getState(currentPage, mUserID), mUserID);
+
+//        mTask = TaskRepository.getInstance(getActivity()).getTaskListFromDBForAdmin(TaskRepository.getInstance(getActivity()).getState(currentPage));
+
+        if (UserRepository.getInstance(getActivity()).isAdmin(mUserID)) {
+            mTask = TaskRepository.getInstance(getActivity()).getTaskListFromDBForAdmin(TaskRepository.getInstance(getActivity()).getState(currentPage));
+        } else {
+            mTask = TaskRepository.getInstance(getActivity()).getTaskListFromDBForUser(TaskRepository.getInstance(getActivity()).getState(currentPage), mUserID);
+        }
+
         mTaskAdapter.setmTask(mTask);
         mTaskAdapter.notifyDataSetChanged();
         ((TaskPagerFragment)getTargetFragment()).notifyAdapter();
@@ -220,6 +253,7 @@ public class TaskListFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
 
         inflater.inflate(R.menu.log_in_menu, menu);
+        inflater.inflate(R.menu.user_menu_access, menu);
 
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.search_task).getActionView();
@@ -227,7 +261,7 @@ public class TaskListFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-                List<Task> searchList = TaskRepository.getInstance(getActivity()).getAllTask(new String[]{mUserID.toString()});
+                List<Task> searchList = TaskRepository.getInstance(getActivity()).getAllUserTask(new String[]{mUserID.toString()});
                 List<Task> newArray = new ArrayList<>();
 
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -262,10 +296,18 @@ public class TaskListFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.menu_log_in: {
                 getActivity().finish();
+                break;
+            }
+            case R.id.menu_users: {
+                UserListFragment userListFragment = UserListFragment.newInstance();
+                userListFragment.setTargetFragment(TaskListFragment.this, REQUEST_CODE_TASK_LIST_FRAGMENT);
+                userListFragment.show(getFragmentManager(), TAG_USER_LIST_FRAGMENT);
+                break;
             }
             default: {
                 return super.onOptionsItemSelected(item);
             }
         }
+        return true;
     }
 }

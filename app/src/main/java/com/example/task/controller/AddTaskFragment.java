@@ -18,7 +18,10 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import com.example.task.R;
 import com.example.task.model.Task;
+import com.example.task.model.User;
 import com.example.task.repository.TaskRepository;
+import com.example.task.repository.UserRepository;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -39,6 +42,7 @@ public class AddTaskFragment extends DialogFragment {
     private EditText mDescription;
     private Button mDateButton;
     private Button mTimeButton;
+    private Button mShareButton;
     private RadioButton getmRadioButtonTask;
     private RadioButton mRadioButtonToDo;
     private RadioButton mRadioButtonDoing;
@@ -95,6 +99,8 @@ public class AddTaskFragment extends DialogFragment {
 
         initUI(view);
 
+//        updatePhotoView;
+
         if (!mTemp.equals("")){
             mDateButton.setText(mTemp);
         }
@@ -112,7 +118,12 @@ public class AddTaskFragment extends DialogFragment {
                         mTask.setmTime(mTime);
                         mTask.setmStateRadioButton(getRadioButtonChecked());
                         mTask.setmStateViewPager(TaskRepository.getInstance(getActivity()).setState(currentPage));
-                        TaskRepository.getInstance(getActivity()).insert(mTask,getRadioButtonChecked() ,currentPage);
+
+                        User user = UserRepository.getInstance(getActivity()).getUser(mUserID);
+                        user.setmTaskCount(UserRepository.getInstance(getActivity()).getTaskCount(user.getmID()) + 1);
+                        UserRepository.getInstance(getActivity()).update(user);
+
+                        TaskRepository.getInstance(getActivity()).insert(mTask, getRadioButtonChecked(), currentPage);
 
                         ((TaskListFragment) getTargetFragment()).notifyAdapter();
                     }
@@ -159,6 +170,7 @@ public class AddTaskFragment extends DialogFragment {
         mDescription = view.findViewById(R.id.describtion_editText);
         mDateButton = view.findViewById(R.id.date_button);
         mTimeButton = view.findViewById(R.id.time_button);
+        mShareButton = view.findViewById(R.id.share_button);
         mRadioGroup = view.findViewById(R.id.radio_group);
         mRadioButtonToDo = view.findViewById(R.id.radioButton_ToDo);
         mRadioButtonDoing = view.findViewById(R.id.radioButton_Doing);
@@ -174,6 +186,8 @@ public class AddTaskFragment extends DialogFragment {
             String timeString = simpleTimeFormat.format(new Date());
             mTimeButton.setText(timeString);
         }
+
+        mShareButton.setVisibility(View.GONE);
     }
 
     @Override
@@ -183,7 +197,7 @@ public class AddTaskFragment extends DialogFragment {
         if (resultCode != Activity.RESULT_OK || data == null){
             return;
         }
-        if (requestCode == REQUEST_CODE_DATE_PICKER && data != null){
+        else if (requestCode == REQUEST_CODE_DATE_PICKER && data != null){
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_TASK_DATE);
 
             mDate = date;
@@ -194,7 +208,7 @@ public class AddTaskFragment extends DialogFragment {
             mDateButton.setText(dateString);
         }
 
-        if (requestCode == REQUEST_CODE_TIME_PICKER && data != null){
+        else if (requestCode == REQUEST_CODE_TIME_PICKER && data != null){
             Date time = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TASK_TIME);
 
                 mTime = time;
@@ -204,5 +218,11 @@ public class AddTaskFragment extends DialogFragment {
                 String dateString = simpleDateFormat.format(mTime);
                 mTimeButton.setText(dateString);
         }
+
+//        else if (requestCode == REQUEST_CODE_CAPTURE_IMAGE){
+//            updatePhotoView;
+
+//        getActivity().revokeUriPermission(mphotouri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+//        }
     }
 }

@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -12,10 +11,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 import com.example.task.R;
-import com.example.task.model.PersonAndTask;
-import com.example.task.repository.PersonAndTaskRepository;
 import com.google.android.material.tabs.TabLayout;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -29,7 +25,6 @@ public class TaskPagerFragment extends Fragment {
     private TabLayout mTabLayout;
     private RecyclerView mTaskRecyclerView;
     private UUID mUserID;
-    private List<PersonAndTask> mLoginAndTask;
     private int mCurrentPage;
     private FragmentPagerAdapter adapter;
 
@@ -53,7 +48,6 @@ public class TaskPagerFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mUserID = (UUID) getArguments().getSerializable(ARG_TASK_PAGER_FRAGMENT_ID);
-        mLoginAndTask = PersonAndTaskRepository.getInstance().getmPersonAndTask();
     }
 
     @Override
@@ -125,6 +119,6 @@ public class TaskPagerFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        mViewPager.getAdapter().notifyDataSetChanged();
+//        adapter.notifyDataSetChanged();
     }
 }

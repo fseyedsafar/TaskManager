@@ -14,8 +14,8 @@ public class TaskDataBaseSchema {
             public static final String DESCRIPTION = "description";
             public static final String DATE = "date";
             public static final String TIME = "time";
-            public static final String STATERADIOBUTTON = "stateRadioButton";
-            public static final String STATEVIEWPAGER = "stateViewPager";
+            public static final String STATE_RADIO_BUTTON = "stateRadioButton";
+            public static final String STATE_VIEW_PAGER = "stateViewPager";
         }
     }
 
@@ -25,8 +25,10 @@ public class TaskDataBaseSchema {
         public static final class Columns{
             public static final String ID = "_id";
             public static final String UUID = "uuid";
+            public static final String DATE = "date";
             public static final String USER = "user";
             public static final String PASS = "pass";
+            public static final String TASK_COUNT = "taskCount";
         }
     }
 }

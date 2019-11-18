@@ -17,5 +17,13 @@
     <string name="todo">ToDo</string>
     <string name="doing">Doing</string>
     <string name="done">Done</string>
+    <string name="sharetask">ShareTask</string>
+    <string name="from_gallery">From Gallery</string>
+    <string name="from_camera">From Camera</string>
+    <string name="admin_login">Admin LogIn</string>
+    <string name="username_in_list">Username:</string>
+    <string name="back">Back</string>
+    <string name="delete_user">Delete User</string>
+    <string name="are_you_sure_you_want_delete_this_user">Are you sure you want delete this user?</string>
 
 </resources>

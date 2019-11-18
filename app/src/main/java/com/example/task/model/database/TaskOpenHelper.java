@@ -25,18 +25,20 @@ public class TaskOpenHelper extends SQLiteOpenHelper {
                 TaskTable.Columns.DESCRIPTION + ", " +
                 TaskTable.Columns.DATE + ", " +
                 TaskTable.Columns.TIME + ", " +
-                TaskTable.Columns.STATERADIOBUTTON + ", " +
-                TaskTable.Columns.STATEVIEWPAGER +
-                ");"
+                TaskTable.Columns.STATE_RADIO_BUTTON + ", " +
+                TaskTable.Columns.STATE_VIEW_PAGER +
+                ")"
         );
 
         sqLiteDatabase.execSQL("CREATE TABLE " + UserTable.NAME +
                 "(" +
                 UserTable.Columns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 UserTable.Columns.UUID + ", " +
+                UserTable.Columns.DATE + ", " +
                 UserTable.Columns.USER + ", " +
-                UserTable.Columns.PASS +
-                ");"
+                UserTable.Columns.PASS + ", " +
+                UserTable.Columns.TASK_COUNT +
+                ")"
         );
     }
 

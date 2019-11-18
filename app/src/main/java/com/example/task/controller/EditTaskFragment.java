@@ -14,13 +14,17 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
+
 import com.example.task.R;
 import com.example.task.model.Task;
+import com.example.task.model.User;
 import com.example.task.repository.TaskRepository;
+import com.example.task.repository.UserRepository;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -38,16 +42,18 @@ public class EditTaskFragment extends DialogFragment {
     public static final String ARG_ID_EDIT_TASK = "argIdEditTask";
     public static final String BOUNDLE_EDIT_TASK_FRAGMENT_DATE = "boundleEditTaskFragmentDate";
     public static final String TAG_TIME_PICKER_FRAGMENT = "tagTimePickerFragment";
+    private TextView mUsername;
     private EditText mTitle;
     private EditText mDescription;
     private Button mDateButton;
     private Button mTimeButton;
+    private Button mShareButton;
     private RadioGroup mRadioGroup;
     private RadioButton getmRadioButtonTask;
     private RadioButton mRadioButtonToDo;
     private RadioButton mRadioButtonDoing;
     private RadioButton mRadioButtonDone;
-    private UUID id;
+    private UUID mUserID;
     private int currentPage;
     private Task mTask;
     private Date mDate;
@@ -86,8 +92,8 @@ public class EditTaskFragment extends DialogFragment {
         }
 
         currentPage = (int) getArguments().getSerializable(ARG_CURRENT_PAGE_EDIT_TEXT);
-        id = (UUID) getArguments().getSerializable(ARG_ID_EDIT_TASK);
-        mTask = TaskRepository.getInstance(getActivity()).getTask(id, currentPage);
+        mUserID = (UUID) getArguments().getSerializable(ARG_ID_EDIT_TASK);
+        mTask = TaskRepository.getInstance(getActivity()).getTask(mUserID);
         mDate = mTask.getmDate();
         mTime = mTask.getmTime();
         mStateRadioButton = mTask.getmStateRadioButton();
@@ -117,7 +123,12 @@ public class EditTaskFragment extends DialogFragment {
                 .setNeutralButton(R.string.Delete, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        TaskRepository.getInstance(getActivity()).delete(mTask, currentPage, mTask.getmID());
+
+                        User user = UserRepository.getInstance(getActivity()).getUser(mTask.getmUserID());
+                        user.setmTaskCount(UserRepository.getInstance(getActivity()).getTaskCount(user.getmID()) - 1);
+                        UserRepository.getInstance(getActivity()).update(user);
+
+                        TaskRepository.getInstance(getActivity()).delete(mTask.getmID());
                         ((TaskListFragment) getTargetFragment()).notifyAdapter();
                     }
                 })
@@ -143,6 +154,24 @@ public class EditTaskFragment extends DialogFragment {
                 timePickerFragment.show(getFragmentManager(), TAG_TIME_PICKER_FRAGMENT);
             }
         });
+
+        mShareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                if (mTask.getmStateRadioButton().equals("")){
+                    intent.putExtra(Intent.EXTRA_TEXT, "Title: " + mTask.getmTitle() + "\n" + "Description: " + mTask.getmDescription() + "\n" + "Date: " + new SimpleDateFormat("yyyy-MM-dd").format(mTask.getmDate()) + "\n" + "Task State: " + mTask.getmStateViewPager());
+                }
+                else {
+                    intent.putExtra(Intent.EXTRA_TEXT, "Title: " + mTask.getmTitle() + "\n" + "Description: " + mTask.getmDescription() + "\n" + "Date: " + new SimpleDateFormat("yyyy-MM-dd").format(mTask.getmDate()) + "\n" + "Task State: " + mTask.getmStateRadioButton());
+                }
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Detail Task");
+
+                intent = Intent.createChooser(intent, "share via");
+                startActivity(intent);
+            }
+        });
     }
 
     private void initUpdateTask() {
@@ -152,6 +181,7 @@ public class EditTaskFragment extends DialogFragment {
         mTask.setmTime(mTime);
         mTask.setmStateRadioButton(getRadioButtonChecked());
         mTask.setmStateViewPager(TaskRepository.getInstance(getActivity()).setState(currentPage));
+
         TaskRepository.getInstance(getActivity()).update(mTask, currentPage, mTask.getmID());
     }
 
@@ -174,17 +204,26 @@ public class EditTaskFragment extends DialogFragment {
     }
 
     private void initUI(View view) {
+        mUsername = view.findViewById(R.id.text_view_username);
         mTitle = view.findViewById(R.id.title_editText);
         mDescription = view.findViewById(R.id.describtion_editText);
         mDateButton = view.findViewById(R.id.date_button);
         mTimeButton = view.findViewById(R.id.time_button);
+        mShareButton = view.findViewById(R.id.share_button);
         mRadioGroup = view.findViewById(R.id.radio_group);
         mRadioButtonToDo = view.findViewById(R.id.radioButton_ToDo);
         mRadioButtonDoing = view.findViewById(R.id.radioButton_Doing);
         mRadioButtonDone = view.findViewById(R.id.radioButton_Done);
+
+//        if (UserRepository.getInstance(getActivity()).isAdmin(mUserID) == true){
+//            mUsername.setVisibility(View.VISIBLE);
+//        } else{
+//            mUsername.setVisibility(View.GONE);
+//        }
     }
 
     private void setUI(){
+//        mUsername.setText(UserRepository.getInstance(getActivity()).getUser(mTask.getmUserID()).getmUser());
         mTitle.setText(mTask.getmTitle());
         mDescription.setText(mTask.getmDescription());
 
