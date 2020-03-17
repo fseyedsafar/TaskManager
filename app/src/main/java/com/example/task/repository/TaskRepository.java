@@ -24,13 +24,10 @@ public class TaskRepository {
     private List<Task> mTaskDone = new ArrayList<>();
     private Context mContext;
     private TaskDao mTaskDao;
-//    private SQLiteDatabase mDatabase;
 
     private TaskRepository(Context context) {
         mContext = context.getApplicationContext();
         TaskOpenHelper taskOpenHelper = new TaskOpenHelper(context);
-//        mDatabase = taskOpenHelper.getWritableDatabase();
-
         SQLiteDatabase db = new TaskOpenHelper(mContext).getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
@@ -47,83 +44,22 @@ public class TaskRepository {
     }
 
     public void insert(Task task, String mStateRadioButton , int currentPage){
-
-//        ContentValues values = getContentValues(task);
-//        mDatabase.insert(NAME, null, values);
-
         mTaskDao.insert(task);
     }
 
     public void update(Task task, int currentPage, UUID id){
-//        mDatabase.update(NAME, getContentValues(task), Columns.UUID + "=?", new String[]{id.toString()});
-
         mTaskDao.update(task);
     }
 
     public void delete(UUID id){
-//        mDatabase.delete(NAME,Columns.UUID + "=?", new String[]{id.toString()});
-
         mTaskDao.delete(getTask(id));
     }
 
-    public ContentValues getContentValues(Task task){
-        ContentValues values = new ContentValues();
-        values.put(Columns.UUID, task.getmID().toString());
-        values.put(Columns.USER_UUID, task.getmUserID().toString());
-        values.put(Columns.TITLE, task.getmTitle());
-        values.put(Columns.DESCRIPTION, task.getmDescription());
-        values.put(Columns.DATE, task.getmDate().getTime());
-        values.put(Columns.TIME, task.getmTime().getTime());
-        values.put(Columns.STATE_RADIO_BUTTON, task.getmStateRadioButton());
-        values.put(Columns.STATE_VIEW_PAGER, task.getmStateViewPager());
-
-        return values;
-    }
-
     public Task getTask(UUID id){
-
-//        TaskCursorWrapper cursor = (TaskCursorWrapper) queryTaskUUID(new String[]{id.toString()});
-//        try {
-//            cursor.moveToFirst();
-//
-//            if (cursor == null || cursor.getCount() == 0){
-//                return null;
-//            }
-//
-//            return cursor.getTask();
-//
-//        }finally {
-//            cursor.close();
-//        }
-
         return mTaskDao.queryBuilder().where(TaskDao.Properties.MID.eq(id)).unique();
     }
 
     public List<Task> getTaskListFromDBForAdmin(String[] state){
-//        List<Task> taskList = new ArrayList<>();
-//
-//        TaskCursorWrapper cursor = (TaskCursorWrapper) queryTaskState(state);
-//
-//        try {
-//            cursor.moveToFirst();
-//
-//            while (!cursor.isAfterLast()) {
-//
-//                if (UserRepository.getInstance(mContext).isAdmin(userID) == true){
-//                    taskList.add(cursor.getTask());
-//                }
-//
-//                else if (cursor.getTask().getmUserID().equals(userID)) {
-//                    taskList.add(cursor.getTask());
-//                }
-//
-//                cursor.moveToNext();
-//            }
-//        }
-//        finally {
-//            cursor.close();
-//        }
-
         QueryBuilder queryBuilder = mTaskDao.queryBuilder();
         queryBuilder.where(queryBuilder.or(TaskDao.Properties.MStateRadioButton.eq(state[0]), queryBuilder
                 .and(TaskDao.Properties.MStateRadioButton.eq(state[1]), TaskDao.Properties.MStateViewPager.eq(state[0]))));
@@ -143,25 +79,7 @@ public class TaskRepository {
     }
 
     public List<Task> getAllUserTask(String[] userID){
-//        List<Task> taskList = new ArrayList<>();
-//
-//        TaskCursorWrapper cursor = (TaskCursorWrapper) queryAllTask(userID);
-//
-//        try {
-//            cursor.moveToFirst();
-//
-//            while (!cursor.isAfterLast()) {
-//                taskList.add(cursor.getTask());
-//
-//                cursor.moveToNext();
-//            }
-//        }
-//        finally {
-//            cursor.close();
-//        }
-
         return mTaskDao.queryBuilder().list();
-//        return mTaskDao.queryBuilder().where(TaskDao.Properties.MUserID.eq(userID)).list();
     }
 
     public String[] getState(int currentPage){
@@ -183,43 +101,6 @@ public class TaskRepository {
         state[1] = "";
         return state;
     }
-
-//    private CursorWrapper queryTaskUUID(String[] id){
-//        Cursor cursor = mDatabase.query(NAME,
-//                null,
-//                Columns.UUID + "=?",
-//                id,
-//                null,
-//                null,
-//                null);
-//
-//        return new TaskCursorWrapper(cursor);
-//    }
-
-//    private CursorWrapper queryAllTask(String[] userID){
-//        Cursor cursor = mDatabase.query(NAME,
-//                null,
-//                Columns.USER_UUID + "=?",
-//                userID,
-//                null,
-//                null,
-//                null);
-//
-//        return new TaskCursorWrapper(cursor);
-//    }
-
-//    private CursorWrapper queryTaskState(String[] state){
-//
-//        Cursor cursor = mDatabase.query(NAME,
-//                null,
-//                (Columns.STATE_RADIO_BUTTON + "=?") + " or " + (Columns.STATE_VIEW_PAGER + "=? and " + Columns.STATE_RADIO_BUTTON + "=?"),
-//                state,
-//                null,
-//                null,
-//                null);
-//
-//        return new TaskCursorWrapper(cursor);
-//    }
 
     public String setState(int currentPage){
         String state = "";

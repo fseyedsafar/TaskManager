@@ -21,19 +21,12 @@ import com.example.task.R;
 import java.util.Calendar;
 import java.util.Date;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class TimePickerFragment extends DialogFragment {
 
     public static final String ARG_TIME_PICKER_TIME = "argTimePickerTime";
     public static final String EXTRA_TASK_TIME = "extraTaskTime";
     private TimePicker mTimePicker;
     private Date mTime;
-
-    public TimePickerFragment() {
-        // Required empty public constructor
-    }
 
     public static TimePickerFragment newInstance(Date mTime) {
 

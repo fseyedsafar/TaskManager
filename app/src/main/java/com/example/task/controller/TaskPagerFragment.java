@@ -114,11 +114,4 @@ public class TaskPagerFragment extends Fragment {
        if (adapter != null)
         adapter.notifyDataSetChanged();
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-//        adapter.notifyDataSetChanged();
-    }
 }

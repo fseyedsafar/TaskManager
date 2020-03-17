@@ -55,11 +55,6 @@ public class AddTaskFragment extends DialogFragment {
     private RadioGroup mRadioGroup;
     private UUID mUserID;
 
-
-    public AddTaskFragment() {
-        // Required empty public constructor
-    }
-
     public static AddTaskFragment newInstance(int currentPage, UUID userID) {
         
         Bundle args = new Bundle();
