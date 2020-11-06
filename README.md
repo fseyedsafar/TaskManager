@@ -14,11 +14,13 @@ width="200" height="350">
 width="200" height="350">
 <img src="https://user-images.githubusercontent.com/54942560/98397048-9919bb80-2013-11eb-8695-84deeb172cff.jpg"
 width="200" height="350">
+<img src="https://user-images.githubusercontent.com/54942560/98397248-eac24600-2013-11eb-9b36-953177d0012e.jpg"
+width="200" height="350">
 </p>
 
 #Description
 #### This app is a sample for managing your tasks.
-The user can log in or sign up and view a list of his tasks in three tabs with names Todo, Doing and Done.
+The user can login or sign up and view a list of his tasks in three tabs with names Todo, Doing and Done.
 User can add, edit, delete, share his tasks and search among all of his tasks. 
 The administrator can logged in and view and manage the tasks of all users.
 #### This app has features such as:
