@@ -8,8 +8,7 @@ width="200" height="350">
 
 #Description
 #### This app is a sample for managing your tasks.
-The user can log in or sign up and view a list of his tasks in three tabs with names Todo,Doing and Done. User can add, edit, delete,share his tasks and search among all of his tasks. The administrator can logged in and view and manage the tasks of all users.
+The user can log in or sign up and view a list of his tasks in three tabs with names Todo, Doing and Done. User can add, edit, delete, share his tasks and search among all of his tasks. The administrator can logged in and view and manage the tasks of all users.
 #### This app has features such as:
 - Using GreenDao library for DB
-- Using Material Design for UI
 - Using MVC architecture
