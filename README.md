@@ -18,7 +18,7 @@ width="200" height="350">
 width="200" height="350">
 </p>
 
-#Description
+# Description
 #### This app is a sample for managing your tasks.
 The user can login or sign up and view a list of his tasks in three tabs with names Todo, Doing and Done.
 User can add, edit, delete, share his tasks and search among all of his tasks. 
