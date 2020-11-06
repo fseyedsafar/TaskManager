@@ -61,8 +61,8 @@ public class TaskRepository {
 
     public List<Task> getTaskListFromDBForAdmin(String[] state){
         QueryBuilder queryBuilder = mTaskDao.queryBuilder();
-        queryBuilder.where(queryBuilder.or(TaskDao.Properties.MStateRadioButton.eq(state[0]), queryBuilder
-                .and(TaskDao.Properties.MStateRadioButton.eq(state[1]), TaskDao.Properties.MStateViewPager.eq(state[0]))));
+        queryBuilder.where(queryBuilder.or(TaskDao.Properties.MStateRadioButton.eq(state[0]),
+                queryBuilder.and(TaskDao.Properties.MStateRadioButton.eq(state[1]), TaskDao.Properties.MStateViewPager.eq(state[0]))));
 
         return queryBuilder.list();
     }

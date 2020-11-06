@@ -267,7 +267,10 @@ public class TaskListFragment extends Fragment {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
                 for (Task task : searchList) {
-                    if (task.getmTitle().contains(s) || task.getmDescription().contains(s) || simpleDateFormat.format(task.getmDate()).contains(s) || task.getmTime().toString().contains(s)){
+                    if (task.getmTitle().contains(s) ||
+                            task.getmDescription().contains(s) ||
+                            simpleDateFormat.format(task.getmDate()).contains(s) ||
+                            task.getmTime().toString().contains(s)){
                         newArray.add(task);
                     }
                 }

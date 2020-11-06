@@ -94,8 +94,6 @@ public class AddTaskFragment extends DialogFragment {
 
         initUI(view);
 
-//        updatePhotoView;
-
         if (!mTemp.equals("")){
             mDateButton.setText(mTemp);
         }
@@ -213,11 +211,5 @@ public class AddTaskFragment extends DialogFragment {
                 String dateString = simpleDateFormat.format(mTime);
                 mTimeButton.setText(dateString);
         }
-
-//        else if (requestCode == REQUEST_CODE_CAPTURE_IMAGE){
-//            updatePhotoView;
-
-//        getActivity().revokeUriPermission(mphotouri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-//        }
     }
 }
